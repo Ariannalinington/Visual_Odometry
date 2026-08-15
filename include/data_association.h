@@ -33,3 +33,9 @@ std::vector<MapMatch> matchMapToFrame(
     const std::vector<MapPoint>& map,
     const Measurement& frame
 );
+
+
+bool isFeatureInMap(
+    const Feature& feature,
+    const std::vector<MapPoint>& map
+);

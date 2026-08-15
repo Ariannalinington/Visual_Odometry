@@ -40,3 +40,14 @@ std::vector<MapPoint> buildInitialMap(
     const Eigen::Matrix3d& K,
     const MotionCandidate& motion
 );
+
+
+int addNewLandmarks(
+    const Measurement& previous_frame,
+    const Measurement& current_frame,
+    const std::vector<Match>& consecutive_matches,
+    const Eigen::Matrix4d& T_prev_w,
+    const Eigen::Matrix4d& T_current_w,
+    const Eigen::Matrix3d& K,
+    std::vector<MapPoint>& map
+);

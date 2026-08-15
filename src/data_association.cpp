@@ -119,3 +119,22 @@ std::vector<MapMatch> matchMapToFrame(
 
     return matches;
 }
+
+
+bool isFeatureInMap(
+    const Feature& feature,
+    const std::vector<MapPoint>& map
+) {
+    const double MATCH_THRESHOLD = 1e-6;
+
+    for (const MapPoint& map_point : map) {
+        const double distance =
+            (feature.appearance - map_point.appearance).norm();
+
+        if (distance < MATCH_THRESHOLD) {
+            return true;
+        }
+    }
+
+    return false;
+}

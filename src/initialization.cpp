@@ -323,3 +323,62 @@ std::vector<MapPoint> buildInitialMap(
 
     return map;
 }
+
+
+int addNewLandmarks(
+    const Measurement& previous_frame,
+    const Measurement& current_frame,
+    const std::vector<Match>& consecutive_matches,
+    const Eigen::Matrix4d& T_prev_w,
+    const Eigen::Matrix4d& T_current_w,
+    const Eigen::Matrix3d& K,
+    std::vector<MapPoint>& map
+) {
+    int added_points = 0;
+
+    const Eigen::Matrix4d T_current_prev =
+        T_current_w * T_prev_w.inverse();
+    const Eigen::Matrix3d R = T_current_prev.block<3,3>(0,0);
+    const Eigen::Vector3d t = T_current_prev.block<3,1>(0,3);
+
+    for (const Match& match : consecutive_matches) {
+        const Feature& previous_feature =
+            previous_frame.features[match.index_frame0];
+        const Feature& current_feature =
+            current_frame.features[match.index_frame1];
+
+        if (isFeatureInMap(previous_feature, map)) {
+            continue;
+        }
+
+        const Eigen::Vector3d p_prev = normalizeImagePoint(
+            previous_feature.image_point, K
+        );
+        const Eigen::Vector3d p_current = normalizeImagePoint(
+            current_feature.image_point, K
+        );
+        const Eigen::Vector3d X_prev = triangulatePoint(
+            p_prev, p_current, R, t
+        );
+        const Eigen::Vector3d X_current = R * X_prev + t;
+
+        if (!X_prev.allFinite() || !X_current.allFinite() ||
+            X_prev.z() <= 0.0 || X_current.z() <= 0.0) {
+            continue;
+        }
+
+        Eigen::Vector4d X_prev_h;
+        X_prev_h << X_prev, 1.0;
+        const Eigen::Vector4d X_world_h =
+            T_prev_w.inverse() * X_prev_h;
+
+        MapPoint new_point;
+        new_point.position = X_world_h.head<3>();
+        new_point.appearance = current_feature.appearance;
+        new_point.actual_id = current_feature.actual_id;
+        map.push_back(new_point);
+        added_points++;
+    }
+
+    return added_points;
+}
