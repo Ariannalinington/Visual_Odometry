@@ -40,3 +40,26 @@ struct Measurement {
 CameraData loadCamera(const std::string& filename);
 
 Measurement loadMeasurement(const std::string& filename);
+
+struct TrajectoryEntry{
+    int pose_id;
+    Eigen::Vector3d odom_pose;
+    Eigen::Vector3d gt_pose;
+
+};
+
+
+struct WorldPoint {
+    int id;
+    Eigen::Vector3d position;
+    Eigen::Matrix<double, 10, 1> appearance;
+};
+
+std::vector<TrajectoryEntry> loadTrajectory(
+    const std::string& filename
+);
+
+
+std::vector<WorldPoint> loadWorld(
+    const std::string& filename
+);

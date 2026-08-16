@@ -141,3 +141,66 @@ Measurement loadMeasurement(const std::string& filename) {
 
     return measurement;
 }
+
+std::vector<TrajectoryEntry> loadTrajectory(
+    const std::string& filename
+) {
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        throw std::runtime_error(
+            "Unable to open trajectory file: " + filename
+        );
+    }
+
+    std::vector<TrajectoryEntry> trajectory;
+
+    TrajectoryEntry entry;
+
+    while (
+        file
+        >> entry.pose_id
+        >> entry.odom_pose(0)
+        >> entry.odom_pose(1)
+        >> entry.odom_pose(2)
+        >> entry.gt_pose(0)
+        >> entry.gt_pose(1)
+        >> entry.gt_pose(2)
+    ) {
+        trajectory.push_back(entry);
+    }
+
+    return trajectory;
+}
+
+
+std::vector<WorldPoint> loadWorld(
+    const std::string& filename
+) {
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        throw std::runtime_error(
+            "Unable to open world file: " + filename
+        );
+    }
+
+    std::vector<WorldPoint> world;
+    WorldPoint point;
+
+    while (
+        file
+        >> point.id
+        >> point.position(0)
+        >> point.position(1)
+        >> point.position(2)
+    ) {
+        for (int i = 0; i < 10; ++i) {
+            file >> point.appearance(i);
+        }
+
+        world.push_back(point);
+    }
+
+    return world;
+}
