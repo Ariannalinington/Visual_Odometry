@@ -47,7 +47,6 @@ Eigen::Matrix4d se3Exp(const Eigen::Matrix<double, 6, 1>& increment) {
 
 }
 
-
 double computeMeanReprojectionError(
     const std::vector<MapPoint>& map,
     const Measurement& frame,
@@ -194,9 +193,28 @@ Eigen::Matrix4d optimizePoseProjectiveICP(
             throw std::runtime_error("ICP produced a non-finite pose increment");
         }
 
-        pose = se3Exp(increment) * pose;
+        const double current_error =
+            computeMeanReprojectionError(map, frame, matches, pose, K);
+        bool accepted = false;
+        double step = 1.0;
 
-        if (increment.norm() < 1e-10) {
+        for (int attempt = 0; attempt < 10; ++attempt) {
+            const Eigen::Matrix4d candidate_pose =
+                se3Exp(step * increment) * pose;
+            const double candidate_error = computeMeanReprojectionError(
+                map, frame, matches, candidate_pose, K
+            );
+
+            if (candidate_error < current_error) {
+                pose = candidate_pose;
+                accepted = true;
+                break;
+            }
+
+            step *= 0.5;
+        }
+
+        if (!accepted || step * increment.norm() < 1e-10) {
             break;
         }
     }
