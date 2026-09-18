@@ -17,6 +17,8 @@ add_executable(
     src/geometry.cpp
     src/initialization.cpp
     src/projective_icp.cpp
+    src/evaluation.cpp
+    src/visualization.cpp
 )
 
 target_link_libraries(
