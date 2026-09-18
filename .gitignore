@@ -1,0 +1,8 @@
+.DS_Store
+.matplotlib-cache/
+.venv/
+build/
+
+trajectory.csv
+map.csv
+visual_odometry_output.txt
