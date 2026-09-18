@@ -119,7 +119,7 @@ int main() {
         Eigen::Matrix4d T_prev = T_c1_w;
         Measurement previous_frame = frame1;
 
-        for (int k = 2; k <= 108; ++k) {
+        for (int k = 2; k <= 120; ++k) {
             std::ostringstream filename;
             filename
                 << "../data/meas-"
